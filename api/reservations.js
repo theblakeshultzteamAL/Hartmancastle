@@ -17,9 +17,8 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'No properties found on this account' });
     }
 
-    const propertyIds = properties.map(p => p.id).join(',');
-
-    const resRes = await fetch(`https://public.api.hospitable.com/v2/reservations?properties=${propertyIds}&per_page=50`, {
+    const propertyParams = properties.map(p => `properties[]=${p.id}`).join('&');
+    const resRes = await fetch(`https://public.api.hospitable.com/v2/reservations?${propertyParams}&per_page=50`, {{
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
     });
     const resData = await resRes.json();
