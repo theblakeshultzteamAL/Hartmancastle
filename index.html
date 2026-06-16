@@ -1,8 +1,10 @@
-<html lang="en"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Hartman Castle — Dashboard</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -72,13 +74,13 @@
 <div class="header">
   <h1><i class="ti ti-building-castle"></i> Hartman Castle</h1>
   <div class="header-right">
-    <span class="updated" id="last-updated">Error</span>
-    <span class="badge badge-warn" id="status-badge">Error</span>
+    <span class="updated" id="last-updated">Loading...</span>
+    <span class="badge badge-live" id="status-badge">Live</span>
     <button class="btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
   </div>
 </div>
 
-<div id="error-area"><div class="error">Could not load data: Failed to fetch</div></div>
+<div id="error-area"></div>
 
 <div class="metric-grid">
   <div class="metric">
@@ -244,6 +246,5 @@ function renderCalendar(accepted) {
 
 loadData();
 </script>
-
-
-</body></html>
+</body>
+</html>
