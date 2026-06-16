@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hartman Castle — Dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f7f5;
+    --surface: #ffffff;
+    --surface2: #f1efe9;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a1a;
+    --text2: #666;
+    --text3: #999;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --green: #166534;
+    --green-light: #dcfce7;
+    --amber: #92400e;
+    --amber-light: #fef3c7;
+    --red: #991b1b;
+    --red-light: #fee2e2;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1.5rem; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .header h1 { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .header h1 i { font-size: 20px; color: var(--blue); }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge-live { background: var(--green-light); color: var(--green); }
+  .badge-demo { background: var(--amber-light); color: var(--amber); }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .btn { font-size: 13px; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); cursor: pointer; color: var(--text); display: flex; align-items: center; gap: 5px; }
+  .btn:hover { background: var(--surface2); }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+  .metric { background: var(--surface2); border-radius: var(--radius-sm); padding: 14px 16px; }
+  .metric-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
+  .metric-value { font-size: 22px; font-weight: 600; color: var(--text); }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .metric-sub.up { color: var(--green); }
+  .metric-sub.down { color: var(--red); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+  .guest-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .guest-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--blue); flex-shrink: 0; }
+  .guest-name { font-size: 14px; font-weight: 500; }
+  .guest-dates { font-size: 12px; color: var(--text2); }
+  .guest-right { margin-left: auto; text-align: right; }
+  .guest-nights { font-size: 12px; color: var(--text2); }
+  .guest-rev { font-size: 13px; font-weight: 600; }
+  .task-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .task-row:last-child { border-bottom: none; }
+  .task-row i { font-size: 16px; color: var(--text2); }
+  .task-label { font-size: 13px; flex: 1; }
+  .task-date { font-size: 12px; color: var(--text2); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-head { font-size: 10px; color: var(--text3); text-align: center; padding: 3px 0; font-weight: 600; }
+  .cal-day { height: 32px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .cal-empty { background: transparent; }
+  .cal-available { background: var(--surface2); color: var(--text2); }
+  .cal-booked { background: var(--blue); color: #fff; font-weight: 600; }
+  .cal-today { outline: 2px solid var(--blue); }
+  .cal-past { opacity: 0.4; }
+  .cal-legend { display: flex; gap: 14px; margin-top: 10px; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .occ-bar-wrap { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+  .occ-bar { height: 100%; background: var(--blue); border-radius: 3px; }
+  .stars { display: flex; gap: 2px; margin-top: 4px; }
+  .star-on { color: #f59e0b; font-size: 14px; }
+  .star-off { color: #d1d5db; font-size: 14px; }
+  .error { background: var(--red-light); color: var(--red); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 1rem; }
+  .spin { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--text2); border-radius: 50%; animation: sp 0.7s linear infinite; vertical-align: middle; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+  .empty { font-size: 13px; color: var(--text3); padding: 8px 0; }
+  .updated { font-size: 12px; color: var(--text3); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><i class="ti ti-building-castle"></i> Hartman Castle</h1>
+  <div class="header-right">
+    <span class="updated" id="last-updated">Loading...</span>
+    <span class="badge badge-live" id="status-badge">Live</span>
+    <button class="btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
+  </div>
+</div>
+
+<div id="error-area"></div>
+
+<div class="metric-grid">
+  <div class="metric">
+    <div class="metric-label">MTD Revenue</div>
+    <div class="metric-value" id="mtd-rev"><span class="spin"></span></div>
+    <div class="metric-sub" id="mtd-sub">&nbsp;</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">YTD Revenue</div>
+    <div class="metric-value" id="ytd-rev"><span class="spin"></span></div>
+    <div class="metric-sub" id="ytd-sub">Jan – present</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Occupancy (mo.)</div>
+    <div class="metric-value" id="occ-rate"><span class="spin"></span></div>
+    <div class="occ-bar-wrap"><div class="occ-bar" id="occ-bar" style="width:0%"></div></div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Avg nightly rate</div>
+    <div class="metric-value" id="avg-rate"><span class="spin"></span></div>
+    <div class="metric-sub">confirmed bookings</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Review score</div>
+    <div class="metric-value" id="review-val">—</div>
+    <div class="stars" id="stars"></div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-title">Upcoming guests</div>
+    <div id="guests-list"><span class="spin"></span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Turnover schedule</div>
+    <div id="turnover-list"><span class="spin"></span></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title" id="cal-title">Calendar</div>
+  <div class="cal-grid" id="cal-grid"></div>
+  <div class="cal-legend">
+    <div class="leg"><div class="leg-dot" style="background:#185FA5"></div> Booked</div>
+    <div class="leg"><div class="leg-dot" style="background:#f1efe9;border:1px solid rgba(0,0,0,0.1)"></div> Available</div>
+  </div>
+</div>
+
+<script>
+function fmt(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function money(n) { return '$' + Math.round(n).toLocaleString(); }
+
+async function loadData() {
+  document.getElementById('last-updated').textContent = 'Refreshing...';
+  try {
+    const res = await fetch('/api/reservations');
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const json = await res.json();
+    const reservations = json.data || [];
+    render(reservations);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    document.getElementById('status-badge').textContent = 'Live';
+    document.getElementById('status-badge').className = 'badge badge-live';
+  } catch(e) {
+    showError('Could not load data: ' + e.message);
+    document.getElementById('last-updated').textContent = 'Error loading';
+    document.getElementById('status-badge').textContent = 'Error';
+    document.getElementById('status-badge').className = 'badge badge-demo';
+  }
+}
+
+function render(reservations) {
+  const now = new Date();
+  const mtdStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const ytdStart = new Date(now.getFullYear(), 0, 1);
+
+  let mtd = 0, ytd = 0, nights = 0, payout = 0;
+  reservations.filter(r => r.status === 'accepted').forEach(r => {
+    const arr = new Date(r.arrival_date);
+    const dep = new Date(r.departure_date);
+    const n = Math.round((dep - arr) / 86400000);
+    const p = r.payout_amount || r.total_price || 0;
+    if (arr >= mtdStart) mtd += p;
+    if (arr >= ytdStart) ytd += p;
+    nights += n; payout += p;
+  });
+
+  const avg = nights > 0 ? Math.round(payout / nights) : 0;
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  let bookedDays = 0;
+  reservations.filter(r => r.status === 'accepted').forEach(r => {
+    const arr = new Date(r.arrival_date);
+    const dep = new Date(r.departure_date);
+    if (arr.getMonth() === now.getMonth() && arr.getFullYear() === now.getFullYear()) {
+      bookedDays += Math.round((dep - arr) / 86400000);
+    }
+  });
+  const occ = Math.min(100, Math.round((bookedDays / daysInMonth) * 100));
+
+  document.getElementById('mtd-rev').textContent = money(mtd);
+  document.getElementById('ytd-rev').textContent = money(ytd);
+  document.getElementById('occ-rate').textContent = occ + '%';
+  document.getElementById('occ-bar').style.width = occ + '%';
+  document.getElementById('avg-rate').textContent = avg ? money(avg) : '—';
+  document.getElementById('review-val').textContent = '—';
+  document.getElementById('stars').innerHTML = '<span style="font-size:11px;color:var(--text3)">not in API yet</span>';
+
+  const upcoming = reservations
+    .filter(r => r.status === 'accepted' && new Date(r.arrival_date) >= now)
+    .sort((a,b) => new Date(a.arrival_date) - new Date(b.arrival_date))
+    .slice(0, 5);
+
+  const gEl = document.getElementById('guests-list');
+  if (!upcoming.length) { gEl.innerHTML = '<p class="empty">No upcoming bookings.</p>'; }
+  else {
+    gEl.innerHTML = upcoming.map(r => {
+      const arr = new Date(r.arrival_date);
+      const dep = new Date(r.departure_date);
+      const n = Math.round((dep - arr) / 86400000);
+      const name = r.guest?.name || r.guest_name || 'Guest';
+      const init = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const p = r.payout_amount || r.total_price || 0;
+      return `<div class="guest-row">
+        <div class="avatar">${init}</div>
+        <div>
+          <div class="guest-name">${name}</div>
+          <div class="guest-dates">${fmt(arr)} → ${fmt(dep)}</div>
+        </div>
+        <div class="guest-right">
+          <div class="guest-nights">${n} night${n!==1?'s':''}</div>
+          ${p ? '<div class="guest-rev">' + money(p) + '</div>' : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const tEl = document.getElementById('turnover-list');
+  if (!upcoming.length) { tEl.innerHTML = '<p class="empty">No upcoming turnovers.</p>'; }
+  else {
+    tEl.innerHTML = upcoming.slice(0,4).map(r => {
+      const arr = new Date(r.arrival_date);
+      const dep = new Date(r.departure_date);
+      return `<div class="task-row"><i class="ti ti-wash"></i><div class="task-label">Cleaning / checkout</div><div class="task-date">${fmt(dep)}</div></div>
+      <div class="task-row"><i class="ti ti-door-enter"></i><div class="task-label">Check-in prep</div><div class="task-date">${fmt(arr)}</div></div>`;
+    }).join('');
+  }
+
+  renderCalendar(reservations);
+}
+
+function renderCalendar(reservations) {
+  const now = new Date();
+  const year = now.getFullYear(), month = now.getMonth();
+  const days = new Date(year, month+1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const booked = new Set();
+  reservations.filter(r => r.status === 'accepted').forEach(r => {
+    const arr = new Date(r.arrival_date);
+    const dep = new Date(r.departure_date);
+    for (let d = new Date(arr); d < dep; d.setDate(d.getDate()+1)) {
+      if (d.getMonth() === month && d.getFullYear() === year) booked.add(d.getDate());
+    }
+  });
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-title').textContent = months[month] + ' ' + year;
+  const heads = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div class="cal-head">${d}</div>`).join('');
+  let cells = '';
+  for (let i = 0; i < firstDay; i++) cells += '<div class="cal-empty"></div>';
+  for (let d = 1; d <= days; d++) {
+    const past = d < now.getDate();
+    const today = d === now.getDate();
+    const isBooked = booked.has(d);
+    let cls = 'cal-day ';
+    cls += past ? 'cal-past cal-available' : isBooked ? 'cal-booked' : 'cal-available';
+    if (today) cls += ' cal-today';
+    cells += `<div class="${cls}">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML = heads + cells;
+}
+
+function showError(msg) {
+  document.getElementById('error-area').innerHTML = `<div class="error">${msg}</div>`;
+  setTimeout(() => document.getElementById('error-area').innerHTML = '', 6000);
+}
+
+loadData();
+</script>
+</body>
+</html>
